@@ -1,5 +1,5 @@
 #using JuMP, Gurobi, JSON, DataFrames, XLSX, Distributions, Random
-using Gurobi, Random
+using Gurobi, Random, JuMP
 
 solver = Gurobi.Optimizer; 
 
