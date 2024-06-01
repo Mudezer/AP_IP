@@ -1,5 +1,5 @@
 #using JuMP, Gurobi, JSON, DataFrames, XLSX, Distributions, Random
-using Gurobi, Random, JuMP, Plots
+using Gurobi, Random, JuMP, Plots, Printf 
 
 include("parser.jl")
 
@@ -69,7 +69,7 @@ function main()
     p = n/2  # Capacité maximale
 
     m0 = 0
-    number = 100
+    number = 10
 
     plot_z = Float64[]  # Tableau pour stocker les valeurs de z
     plot_i = Int64[]    # Tableau pour stocker les valeurs de i
@@ -83,7 +83,11 @@ function main()
 
         r1 = r[end]
         
+        getTime = time()
+        
         z = APC(n, p, r, r0, mu, m0)
+        timeConsumed = round(time() - getTime, digits=6)
+        @printf(" | time (s): %10.6f", timeConsumed)
 
         push!(plot_z, z)   # Ajouter la valeur de z au tableau
         push!(plot_i, i)   # Ajouter la valeur de i au tableau
