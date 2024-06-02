@@ -1,6 +1,8 @@
 
 using JuMP, Plots, DataFrames, Gurobi, Statistics
 
+include("parser.jl")
+
 # Definition of the model APL lambda
 function APL_lambda_model(n, r0, r, mu, p, lambda)
 
@@ -120,13 +122,10 @@ function lagrangian_dual(r0, r, mu, p, epsilon)
     return best_value, best_lambda, pbounds, dbounds
 end
 
-# test
-r0 = 0.0
-r = [1.0, 2.0, 3.0]
-mu = [0.1, 0.2, 0.3]
 p = 2
 epsilon = 0.01
 
+r0, r, mu = call_parser(1)
 best_value, best_lambda, pbounds, dbounds = lagrangian_dual(r0, r, mu, p, epsilon)
 
 println("Meilleure valeur duale : ", best_value)
