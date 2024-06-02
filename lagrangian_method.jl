@@ -7,17 +7,16 @@ function APC_IP_model(n, r0, r, mu, p, lambda)
 
     model = Model(Gurobi.Optimizer)
 
-    @variable(model, x[1:n], Bin)
     @variable(model, y0 >= 0)
     @variable(model, y[i in 1:n] >= 0) 
-    @variable(model, z[1:n], Bin)
 
     for i in 1:n
-        @constraint(model, y[i] <= y0 * exp(mu[i]) * z[i])
+        @constraint(model, y[i] <= y0 * exp(mu[i]))
     end
-    @constraint(model, [i in 1:n], y[i] <= y0*exp(mu[i]))
 
-    @objective(model, Max, y0(r0+lambda*p) + sum( (r[i]*exp(mu[i])-lambda) / exp(mu[i])*y[i] for i in 1:n) )
+    @constraint(model, y0 + sum( y[i] for i in 1:n) == 1)
+
+    @objective(model, Max, y0*(r0+lambda*p) + sum( (r[i]*exp(mu[i])-lambda) / exp(mu[i])*y[i] for i in 1:n) )
 
     return model
 end
@@ -62,7 +61,7 @@ end
 function main()
 
     # Input data
-    n  = 5000     
+    n  = 10   
     p  = n / 2  
 
     r0, r, mu = call_parser(10)
@@ -81,11 +80,10 @@ function main()
     println("Best objective value: ", best_objective)
 
     i= 0
-    lambda = 0
 
     # Plot the primal and dual bounds
     while i < 10 
-        objective = lagrangian_method(n, p, r, mu, r0, lambda)
+        objective = lagrangian_method(n, p, r, mu, r0, best_lambda)
         push!(primal_bounds, objective)
         push!(dual_bounds, best_objective)
 
@@ -93,9 +91,9 @@ function main()
             break
         end
         i += 1
-        lambda += epsilon
+        best_lambda += epsilon
     end
 
-    plot(0:epsilon:best_lambda, primal_bounds, label="Primal Bound", xlabel="Lambda", ylabel="Objective Value")
+    #plot(0:epsilon:best_lambda, primal_bounds, label="Primal Bound", xlabel="Lambda", ylabel="Objective Value")
     #plot!(0:epsilon:best_lambda, dual_bounds, label="Dual Bound", linestyle=:dash)
 end
