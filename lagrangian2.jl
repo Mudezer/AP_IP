@@ -72,7 +72,7 @@ function lagrangian_dual(r0, r, mu, p, epsilon)
         # cut the search interval in half
         lambda = (lambda_inf + lambda_sup) / 2
         # solve the pb with the new lambda
-        S_opt, value_opt = lagrange_relaxed_problem(r0, r, mu, lambda, p)
+        S_opt, value_opt = greedy_lagrange(r0, r, mu, lambda, p)
         #value_opt = lagrangian_method(n, p, r, mu, r0, lambda) # using Gurobi to solve the pb, no limited in the number of items
         # update bounds
         push!(pbounds, value_opt)
