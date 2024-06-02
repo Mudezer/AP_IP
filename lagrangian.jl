@@ -70,7 +70,7 @@ function greedy_lagrange(r0, r, mu, lambda, p)
     rlambda = [(r[i] * exp(mu[i]) - lambda)/exp(mu[i]) for i in 1:n]
     I = collect(1:n)
     S_opt = []
-    value_opt = 0.0
+    value_opt = 0
 
     for k in I
         # Compute the values of π
@@ -94,7 +94,7 @@ end
 # lagrangian dual problem with dichotomie
 function lagrangian_dual(r0, r, mu, p, epsilon)
     # bounds of lambda as precised in the report
-    lambda_inf = 0.0
+    lambda_inf = 0
     lambda_sup = maximum([0, maximum(r) - r0] ./ p)
     # Init
     best_value = -Inf
@@ -145,6 +145,8 @@ best_value, best_lambda, pbounds, dbounds = lagrangian_dual(r0, r, mu, p, epsilo
 println("Meilleure valeur duale : ", best_value)
 println("Meilleure lambda : ", best_lambda)
 
+@show(pbounds)
+@show(dbounds)
 # Plot
 plot(pbounds, label="Primal Bound", xlabel="Iteration", ylabel="Value")
 plot!(dbounds, label="Dual Bound", xlabel="Iteration", ylabel="Value")

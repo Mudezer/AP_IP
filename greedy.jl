@@ -4,7 +4,7 @@ function greedy_AP(r0, r, μ)
     n = length(r)
     I = collect(1:n)
     S_opt = []
-    value_opt = 0.0
+    value_opt = 0
 
     for k in I
         # Compute the values of π
