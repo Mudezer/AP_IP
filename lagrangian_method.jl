@@ -10,7 +10,6 @@ function APC_IP_model(n, r0, r, mu, p, lambda)
     @variable(model, x[1:n], Bin)
     @variable(model, y0 >= 0)
     @variable(model, y[i in 1:n] >= 0) 
-    @variable(model, z[1:n], Bin)
 
     for i in 1:n
         @constraint(model, y[i] <= y0 * exp(mu[i]) * z[i])
