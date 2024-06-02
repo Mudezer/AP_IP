@@ -6,6 +6,10 @@ The APC is composed of several functions named APC_L(), APC_MILP(), APC_random()
 
 Assuming that the standard distribution of Julia v1.10 is properly installed and configured on the targeted computer (see https://julialang.org/), codes can be executed with this ways:
 
+
+The instances files should be contained in a folder named "data" for the code to run without modifying the julia files.
+The instances should be in csv files, where each column is an instance ordered in descending order (i.e. r0 should be at the top and r_n at the bottom)
+
 From the command-line of the Julia REPL; type:
 
         - include("APC.jl")
