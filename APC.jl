@@ -1,6 +1,7 @@
 using Gurobi, Random, JuMP, Plots, Printf, JSON, DataFrames, XLSX, Distributions
 
 include("parser.jl")
+include("greedy.jl")
 
 solver = Gurobi.Optimizer; 
 
@@ -177,7 +178,7 @@ end
 # =============================================================
 
 function main()
-    n = 10   
+    n = 10 
     p = n / 2  
 
     m0 = 0
