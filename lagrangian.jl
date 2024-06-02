@@ -146,8 +146,8 @@ best_value, best_lambda, pbounds, dbounds = lagrangian_dual(r0, r, mu, p, epsilo
 println("Meilleure valeur duale : ", best_value)
 println("Meilleure lambda : ", best_lambda)
 
-@show(pbounds)
-@show(dbounds)
+#@show(pbounds)
+#@show(dbounds)
 # Plot
 plot(pbounds, label="Primal Bound", xlabel="Iteration", ylabel="Value")
 plot!(dbounds, label="Dual Bound", xlabel="Iteration", ylabel="Value")
