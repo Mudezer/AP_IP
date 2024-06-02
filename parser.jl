@@ -14,8 +14,8 @@ end
 
 function call_parser(i)
     # Define the filenames for the data files
-    filename_r = "data/medium-r.csv"
-    filename_mu = "data/medium-mu.csv"
+    filename_r = "data/small-r.csv"
+    filename_mu = "data/small-mu.csv"
 
     # Initialize empty arrays to store the vectors
     r_vectors_r = []
