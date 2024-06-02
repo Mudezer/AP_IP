@@ -99,16 +99,3 @@ function main()
     #plot(0:epsilon:best_lambda, primal_bounds, label="Primal Bound", xlabel="Lambda", ylabel="Objective Value")
     #plot!(0:epsilon:best_lambda, dual_bounds, label="Dual Bound", linestyle=:dash)
 end
-
-tab=[]
-tabz=[]
-
-for i in 1:100
-    getTime = time()
-    z = main()#z = APC_MILP(n, p, r, r0, mu, m0)  # Solve the APC_MILP model
-    timeConsumed = round(time() - getTime, digits=6)
-
-    push!(tab, timeConsumed)
-end
-
-@show tab
