@@ -3,7 +3,7 @@ using JuMP, Plots, DataFrames, Gurobi
 include("parser.jl")
 
 # Definition of the model
-function APC_IP_model(n, r0, r, mu, p, lambda)
+function APL_lambda_model(n, r0, r, mu, p, lambda)
 
     model = Model(Gurobi.Optimizer)
 
@@ -24,7 +24,7 @@ end
 # Lagrangian algorithm to solve the primal problem
 function lagrangian_method(n, p, r, mu, r0, lambda)
 
-    model = APC_IP_model(n, r0, r, mu, p, lambda)
+    model = APL_lambda_model(n, r0, r, mu, p, lambda)
     optimize!(model)
     return objective_value(model)
 end
