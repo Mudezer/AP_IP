@@ -126,6 +126,7 @@ function lagrangian_dual(r0, r, mu, p, epsilon)
     return best_value, best_lambda, pbounds, dbounds
 end
 
+epsilon = 0.01
 
 #############################
 
