@@ -2,6 +2,7 @@ using Gurobi, Random, JuMP, Plots, Printf, JSON, DataFrames, XLSX, Distributions
 
 include("parser.jl")
 include("greedy.jl")
+include("lagrangian_method.jl")
 
 solver = Gurobi.Optimizer; 
 
@@ -194,7 +195,7 @@ function main()
         println("i: $i")
         r0, r, mu = call_parser(i)  # Parse input data
         getTime = time()
-        
+
         z = APC_MILP(n, p, r, r0, mu, m0)  # Solve the APC_MILP model
         timeConsumed = round(time() - getTime, digits=6)
         @printf(" | time (s): %10.6f", timeConsumed)
