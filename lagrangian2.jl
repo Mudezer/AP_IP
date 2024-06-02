@@ -1,5 +1,32 @@
-using Plots
-using Statistics
+
+using JuMP, Plots, DataFrames, Gurobi, Statistics
+
+# Definition of the model APL lambda
+function APL_lambda_model(n, r0, r, mu, p, lambda)
+
+    model = Model(Gurobi.Optimizer)
+
+    @variable(model, y0 >= 0)
+    @variable(model, y[i in 1:n] >= 0) 
+
+    for i in 1:n
+        @constraint(model, y[i] <= y0 * exp(mu[i]))
+    end
+
+    @constraint(model, y0 + sum( y[i] for i in 1:n) == 1)
+
+    @objective(model, Max, y0*(r0+lambda*p) + sum( (r[i]*exp(mu[i])-lambda) / exp(mu[i])*y[i] for i in 1:n) )
+
+    return model
+end
+
+# Lagrangian algorithm to solve the primal problem
+function lagrangian_method(n, p, r, mu, r0, lambda)
+
+    model = APL_lambda_model(n, r0, r, mu, p, lambda)
+    optimize!(model)
+    return objective_value(model)
+end
 
 # Greedy for lagrangian using r(lambda) and r0(lambda ) form describe in the repoert
 function greedy_lagrange(r0, r, mu, lambda, p)
@@ -46,7 +73,7 @@ function lagrangian_dual(r0, r, mu, p, epsilon)
         lambda = (lambda_inf + lambda_sup) / 2
         # solve the pb with the new lambda
         S_opt, value_opt = lagrange_relaxed_problem(r0, r, mu, lambda, p)
-        
+        #value_opt = lagrangian_method(n, p, r, mu, r0, lambda) # using Gurobi to solve the pb, no limited in the number of items
         # update bounds
         push!(pbounds, value_opt)
         push!(dbounds, lambda)
