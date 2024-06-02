@@ -94,6 +94,7 @@ function main()
         best_lambda += epsilon
     end
 
-    #plot(0:epsilon:best_lambda, primal_bounds, label="Primal Bound", xlabel="Lambda", ylabel="Objective Value")
-    #plot!(0:epsilon:best_lambda, dual_bounds, label="Dual Bound", linestyle=:dash)
+    # Plot the graph of primal and dual bounds
+    plot(primal_bounds, label="Primal Bound", xlabel="Iteration", ylabel="Value")
+    plot!(dual_bounds, label="Dual Bound", xlabel="Iteration", ylabel="Value")
 end
