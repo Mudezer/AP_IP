@@ -24,13 +24,3 @@ function greedy_AP(r0, r, μ)
 
     return S_opt, value_opt
 end
-
-# Exemple d'utilisation
-r0 = 0.0
-r = [1.0, 2.0, 3.0]
-μ = [0.1, 0.2, 0.3]
-
-S_opt, value_opt = greedy_AP(r0, r, μ)
-
-println("Meilleure sélection de produits : ", S_opt)
-println("Valeur optimale : ", value_opt)
