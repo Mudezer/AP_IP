@@ -204,7 +204,7 @@ function main()
     # Plot
     plot(plot_i, plot_z, label="Primal Bound", xlabel="Iteration", ylabel="Objective Value")  
     
-    # Enregistrer les résultats dans un fichier CSV
+    # Enregistrer les résultats dans un fichier CSV -> seulement pour random
     #result_df = DataFrame(Iteration = plot_i, Objective_Value = plot_z)
     #CSV.write("results.csv", result_df)
 end
