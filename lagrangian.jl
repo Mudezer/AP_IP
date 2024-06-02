@@ -1,3 +1,4 @@
+# Lagrangian method for the part 4.3.4 of the report
 
 using JuMP, Plots, DataFrames, Gurobi, Statistics
 
@@ -22,7 +23,7 @@ function APL_lambda_model(n, r0, r, mu, p, lambda)
     return model
 end
 
-# Lagrangian algorithm to solve the primal problem
+# Solving APL_lambda_model using Gurobi
 function lagrangian_method(n, p, r, mu, r0, lambda)
 
     model = APL_lambda_model(n, r0, r, mu, p, lambda)
@@ -31,37 +32,40 @@ function lagrangian_method(n, p, r, mu, r0, lambda)
 end
 
 
-# Binary search for the dual
+# Binary search using APL_lambda_model 
 function binary_search(epsilon, r0, p, mu, r)
-    lambda_min     = 0.0
+    lambda_inf     = 0.0
     r1             = maximum(r)
-    lambda_max     = r1 / p
-    best_lambda    = lambda_min
-    best_objective = -Inf
+    lambda_sup     = maximum([0, r1 - r0] ./ p)
+    best_lambda    = lambda_inf
+    best_value = -Inf
 
-    while (lambda_max - lambda_min) > epsilon
+    # stopping criteria
+    while (lambda_sup - lambda_inf) > epsilon
 
-        lambda_middle = (lambda_min + lambda_max) / 2
-        objective = lagrangian_method(length(r), p, r, mu, r0, lambda_middle)
+        lambda_middle = (lambda_inf + lambda_sup) / 2
+        value = lagrangian_method(length(r), p, r, mu, r0, lambda_middle)
         
-        if objective > best_objective
-            best_objective = objective
+        # update best value
+        if value > best_value
+            best_value = value
             best_lambda    = lambda_middle
         end
 
-        if objective < lagrangian_method(length(r), p, r, mu, r0, lambda_min)[1]
-            lambda_max = lambda_middle
+        if value < lagrangian_method(length(r), p, r, mu, r0, lambda_inf)[1]
+            lambda_sup = lambda_middle
         else
-            lambda_min = lambda_middle
+            lambda_inf = lambda_middle
         end
     end
 
-    return best_lambda, best_objective
+    return best_lambda, best_value
 end
 
-# Greedy for lagrangian using r(lambda) and r0(lambda ) form describe in the repoert
+# Greedy for lagrangian using r(lambda) and r0(lambda) form as describe in the repert
 function greedy_lagrange(r0, r, mu, lambda, p)
     n = length(r)
+    # define as in the report in section 4.3.1
     r0lambda = r0 - lambda * p
     rlambda = [(r[i] * exp(mu[i]) - lambda)/exp(mu[i]) for i in 1:n]
     I = collect(1:n)
@@ -87,7 +91,7 @@ function greedy_lagrange(r0, r, mu, lambda, p)
     return S_opt, value_opt
 end
 
-# lagrangien dual problem with dichotomie
+# lagrangian dual problem with dichotomie
 function lagrangian_dual(r0, r, mu, p, epsilon)
     # bounds of lambda as precised in the report
     lambda_inf = 0.0
@@ -122,15 +126,25 @@ function lagrangian_dual(r0, r, mu, p, epsilon)
     return best_value, best_lambda, pbounds, dbounds
 end
 
-p = 2
-epsilon = 0.01
 
+#############################
+
+
+# Instance
 r0, r, mu = call_parser(1)
+
+# Parameters
+epsilon = 0.01
+n=length(r)
+p=n/2
+
+# Resolution
 best_value, best_lambda, pbounds, dbounds = lagrangian_dual(r0, r, mu, p, epsilon)
 
+# Print
 println("Meilleure valeur duale : ", best_value)
 println("Meilleure lambda : ", best_lambda)
 
-# Plot the graph of primal and dual bounds
+# Plot
 plot(pbounds, label="Primal Bound", xlabel="Iteration", ylabel="Value")
 plot!(dbounds, label="Dual Bound", xlabel="Iteration", ylabel="Value")
