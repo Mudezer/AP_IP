@@ -1,5 +1,4 @@
-#using JuMP, Gurobi, JSON, DataFrames, XLSX, Distributions, Random
-using Gurobi, Random, JuMP, Plots, Printf 
+using Gurobi, Random, JuMP, Plots, Printf, JSON, DataFrames, XLSX, Distributions
 
 include("parser.jl")
 
@@ -99,9 +98,9 @@ end
 Random.seed!(123)
 
 function generateParameters(n)
-    r = rand(Uniform(0,1),n); # avant c'etait 10 à la place de n
+    r = rand(Uniform(0,1),1000000); 
     r0 = 0
-    mu = rand(Uniform(0,1),n);
+    mu = rand(Uniform(0,1),1000000);
     mu0 = 0
     return mu0, mu, r0, r
 end
@@ -112,7 +111,7 @@ function APC_random()
     model = Model(solver)
 
     # Parameters: 
-    n = 10
+    n = 1000000
     p = [1,n/5,n/2,n]
     mu0, mu, r0, r = generateParameters(n)
 
@@ -151,18 +150,25 @@ end
 # APC-IP ======================================================
 # =============================================================
 
-function APC_IP(lambda,mu,r)
 
+function APC_IP(lambda, mu, r)
+
+    # Define the model with Gurobi optimizer
     model = Model(Gurobi.Optimizer)
     
+    # Variables ----------------------------------------------- 
     @variable(model, x[1:n], Bin)  
 
+    # Constraints ---------------------------------------------
     @constraint(model, sum(x[i] for i in 1:n) <= p)
 
+    # Objective function --------------------------------------
     @objective(model, Max, (r0 + sum(x[i] * r[i] * exp(mu[i]) for i in 1:n)) / (1 + sum(x[i] * exp(mu[i]) for i in 1:n)))
     
+    # Solve the model
     optimize!(model)
 
+    # Return the optimal value of the objective and the values of x
     return objective_value(model), value.(x)
 end
 
@@ -171,40 +177,58 @@ end
 # =============================================================
 
 function main()
-    n = 10   # Nombre de produits
-    p = n/2  # Capacité maximale
+    n = 10   
+    p = n / 2  
 
     m0 = 0
-    number = 10
+    number = 100
 
-    plot_z = Float64[]  # Tableau pour stocker les valeurs de z
-    plot_i = Int64[]    # Tableau pour stocker les valeurs de i
+    plot_z = Float64[]  # Array to store objective values
+    plot_i = Int64[]    # Array to store iteration numbers
 
     i = 1
     z = 0
 
     while i <= number
         println("i: $i")
-        r0, r, mu = call_parser(i)
-
-        #r1 = r[end]
-        
+        r0, r, mu = call_parser(i)  # Parse input data
         getTime = time()
         
-        z = APC_L(n, p, r, r0, mu, m0)
+        z = APC_MILP(n, p, r, r0, mu, m0)  # Solve the APC_MILP model
         timeConsumed = round(time() - getTime, digits=6)
         @printf(" | time (s): %10.6f", timeConsumed)
 
-        push!(plot_z, z)   # Ajouter la valeur de z au tableau
-        push!(plot_i, i)   # Ajouter la valeur de i au tableau
+        # Store the objective value and iteration number
+        push!(plot_z, z)   
+        push!(plot_i, i)   
 
         i += 1
     end
 
-    # Plot
+    # Plot the results
     plot(plot_i, plot_z, label="Primal Bound", xlabel="Iteration", ylabel="Objective Value")  
-    
-    # Enregistrer les résultats dans un fichier CSV -> seulement pour random
-    #result_df = DataFrame(Iteration = plot_i, Objective_Value = plot_z)
-    #CSV.write("results.csv", result_df)
+end
+
+function time_MILP_model()
+    getTime = time()
+    z = APC_random()
+    timeConsumed = round(time() - getTime, digits=6)
+
+    # Print the results
+    println("\n The optimal value is ", z, " and the time is ", timeConsumed)
+
+end
+
+function time_APCL_model()
+    n = 10
+    p = [1,n/5,n/2,n]
+    mu0, mu, r0, r = generateParameters(n)
+
+    getTime = time()
+    z = APC_L(n,p,r,r0,mu,m0)
+    timeConsumed = round(time() - getTime, digits=6)
+
+    # Print the results
+    println("\n The optimal value is ", z, " and the time is ", timeConsumed)
+
 end
