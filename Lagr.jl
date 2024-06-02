@@ -16,7 +16,7 @@ function APC_IP_model(n, r0, r, mu, p, lambda)
 end
 
 # Algorithme du Lagrangien pour résoudre le problème primal
-function solve_lagrangian(n, p, r, mu, r0, lambda)
+function lagrangian_method(n, p, r, mu, r0, lambda)
     model = APC_IP_model(n, r0, r, mu, p, lambda)
 
     optimize!(model)
@@ -24,7 +24,7 @@ function solve_lagrangian(n, p, r, mu, r0, lambda)
 end
 
 # Recherche binaire pour le dual
-function binary_search_dual(epsilon, r0, p, mu, r)
+function binary_search(epsilon, r0, p, mu, r)
     lambda_min     = 0.0
     r1             = maximum(r)
     lambda_max     = r1 / p
@@ -34,14 +34,14 @@ function binary_search_dual(epsilon, r0, p, mu, r)
     while (lambda_max - lambda_min) > epsilon
 
         lambda_middle      = (lambda_min + lambda_max) / 2
-        objective, useless = solve_lagrangian(length(r), p, r, mu, r0, lambda_middle)
+        objective, useless = lagrangian_method(length(r), p, r, mu, r0, lambda_middle)
         
         if objective > best_objective
             best_objective = objective
             best_lambda    = lambda_middle
         end
 
-        if objective < solve_lagrangian(length(r), p, r, mu, r0, lambda_min)[1]
+        if objective < lagrangian_method(length(r), p, r, mu, r0, lambda_min)[1]
             lambda_max = lambda_middle
         else
             lambda_min = lambda_middle
@@ -68,14 +68,14 @@ function main()
     dual_bounds = Float64[]
 
     # Recherche de la meilleure valeur de lambda
-    best_lambda, best_objective = binary_search_dual(epsilon, r0, p, mu, r)
+    best_lambda, best_objective = binary_search(epsilon, r0, p, mu, r)
 
     println("Meilleure lambda: ", best_lambda)
     println("Meilleure valeur objective: ", best_objective)
 
     # Tracé des bornes primales et duales
     for lambda in 0:epsilon:best_lambda
-        objective, useless = solve_lagrangian(n, p, r, mu, r0, lambda)
+        objective, useless = lagrangian_method(n, p, r, mu, r0, lambda)
         push!(primal_bounds, objective)
         push!(dual_bounds, best_objective)
     end
