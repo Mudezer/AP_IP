@@ -28,6 +28,35 @@ function lagrangian_method(n, p, r, mu, r0, lambda)
     return objective_value(model)
 end
 
+
+# Binary search for the dual
+function binary_search(epsilon, r0, p, mu, r)
+    lambda_min     = 0.0
+    r1             = maximum(r)
+    lambda_max     = r1 / p
+    best_lambda    = lambda_min
+    best_objective = -Inf
+
+    while (lambda_max - lambda_min) > epsilon
+
+        lambda_middle = (lambda_min + lambda_max) / 2
+        objective = lagrangian_method(length(r), p, r, mu, r0, lambda_middle)
+        
+        if objective > best_objective
+            best_objective = objective
+            best_lambda    = lambda_middle
+        end
+
+        if objective < lagrangian_method(length(r), p, r, mu, r0, lambda_min)[1]
+            lambda_max = lambda_middle
+        else
+            lambda_min = lambda_middle
+        end
+    end
+
+    return best_lambda, best_objective
+end
+
 # Greedy for lagrangian using r(lambda) and r0(lambda ) form describe in the repoert
 function greedy_lagrange(r0, r, mu, lambda, p)
     n = length(r)
